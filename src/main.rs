@@ -1,9 +1,8 @@
 use std::{env, fs};
-use std::path::Path;
-
-use crate::domain::elf::Elf;
+use crate::solutions::day01;
 
 pub mod domain;
+pub mod solutions;
 
 macro_rules! ship_it {
     ($answer:expr, $day:expr) => {
@@ -15,33 +14,34 @@ macro_rules! ship_it {
 }
 
 fn main() {
-    ship_it!(day1a_puzzle(), "Day1_a");
+    ship_it!(day01::part_one(), "day1a");
+    ship_it!(day01::part_two(), "day1b");
 }
 
 
-fn day1a_puzzle() -> i32 {
-    let file_path = Path::new("day1_input.txt");
+// fn day1a_puzzle() -> i32 {
+//     let file_path = Path::new("day1_input.txt");
     
-    if !file_path.exists() {
-        panic!("failure");
-    }
+//     if !file_path.exists() {
+//         panic!("failure");
+//     }
 
-    let file_content = fs::read_to_string(file_path).unwrap();
-    let mut elves = Vec::<Elf>::new();
-    let inventories = file_content.split("\n\n");
+//     let file_content = fs::read_to_string(file_path).unwrap();
+//     let mut elves = Vec::<Elf>::new();
+//     let inventories = file_content.split("\n\n");
 
 
-    inventories.enumerate().for_each(|(_pos, a)| {
-        let mut calories = 0;
+//     inventories.enumerate().for_each(|(_pos, a)| {
+//         let mut calories = 0;
 
-        a.lines().for_each(|f| {
-            calories += f.parse::<i32>().unwrap();
-        });
+//         a.lines().for_each(|f| {
+//             calories += f.parse::<i32>().unwrap();
+//         });
 
-        elves.push(Elf { total_calories: calories });
-    });
+//         elves.push(Elf { total_calories: calories });
+//     });
  
 
-    let answer = elves.iter().max_by_key(|x| x.total_calories);
-    return answer.unwrap().total_calories;
-}
+//     let answer = elves.iter().max_by_key(|x| x.total_calories);
+//     return answer.unwrap().total_calories;
+// }
