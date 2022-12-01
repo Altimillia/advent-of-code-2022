@@ -1,3 +1,47 @@
+use std::{env, fs};
+use std::path::Path;
+
+use crate::domain::elf::Elf;
+
+pub mod domain;
+
+macro_rules! ship_it {
+    ($answer:expr, $day:expr) => {
+        println!("-------");
+        println!("{0}", $day);
+        println!("{0}", $answer);
+        println!("-------");
+    };
+}
+
 fn main() {
-    println!("Hello, world, but not you.!");
+    ship_it!(day1a_puzzle(), "Day1_a");
+}
+
+
+fn day1a_puzzle() -> i32 {
+    let file_path = Path::new("day1_input.txt");
+    
+    if !file_path.exists() {
+        panic!("failure");
+    }
+
+    let file_content = fs::read_to_string(file_path).unwrap();
+    let mut elves = Vec::<Elf>::new();
+    let inventories = file_content.split("\n\n");
+
+
+    inventories.enumerate().for_each(|(_pos, a)| {
+        let mut calories = 0;
+
+        a.lines().for_each(|f| {
+            calories += f.parse::<i32>().unwrap();
+        });
+
+        elves.push(Elf { total_calories: calories });
+    });
+ 
+
+    let answer = elves.iter().max_by_key(|x| x.total_calories);
+    return answer.unwrap().total_calories;
 }
