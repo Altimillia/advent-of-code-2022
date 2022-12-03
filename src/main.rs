@@ -1,6 +1,6 @@
 use std::fs;
 use std::path::Path;
-use crate::solutions::{day01, day02};
+use crate::solutions::{day01, day02, day03};
 
 pub mod domain;
 pub mod solutions;
@@ -19,6 +19,8 @@ fn main() {
     ship_it!(day01::part_two(), "day1b");
     ship_it!(day02::part_one(load_file("day2_input.txt")), "day2a");
     ship_it!(day02::part_two(load_file("day2_input.txt")), "day2b");
+    ship_it!(day03::part_one(load_file("day3_input.txt")), "day3a");
+    ship_it!(day03::part_two(load_file("day3_input.txt")), "day3b");
 }
 
 fn load_file(path: &str) -> String {
