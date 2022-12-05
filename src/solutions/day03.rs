@@ -80,6 +80,7 @@ impl Rucksack {
         return all;
     }
 }
+
 #[derive(PartialEq, Eq, Clone)]
 struct Supply {
     item_type: char
