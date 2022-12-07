@@ -1,7 +1,7 @@
 use std::{fs, fmt::Display};
 use std::path::Path;
 use std::time::Instant;
-use crate::solutions::{day01, day02, day03, day04, day05, day06};
+use crate::solutions::{day01, day02, day03, day04, day05, day06, day07};
 
 pub mod domain;
 pub mod solutions;
@@ -52,6 +52,7 @@ fn main() {
     ship_it_extreme!(day04, load_file("day4_input.txt"), "Day 4");
     ship_it_extreme!(day05, load_file("day5_input.txt"), "Day 5");
     ship_it_extreme!(day06, load_file("day6_input.txt"), "Day 6");
+    ship_it_extreme!(day07, load_file("day7_input.txt"), "Day 7");
 }
 
 fn load_file(path: &str) -> String {

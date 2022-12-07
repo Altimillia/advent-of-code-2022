@@ -204,7 +204,7 @@ mod tests {
 
         assert_eq!(storage.crate_stacks.len(), 9);
         storage.print_stacks();
-        assert_eq!(storage.crate_stacks.len(), 7);
+        assert_eq!(storage.crate_stacks.len(), 9);
     }
 
     #[test]
