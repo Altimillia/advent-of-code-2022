@@ -1,4 +1,4 @@
-use std::{path::{Path, self, PathBuf}, rc::Rc, cell::RefCell, io::Read};
+use std::{path::{Path, PathBuf}};
 
 pub fn part_one(input: String) -> usize { 
     let fs = FileSystem { root: Directory { name: "/".to_string(), files: Vec::new(), directories: Vec::new() }};
@@ -10,6 +10,7 @@ pub fn part_one(input: String) -> usize {
 pub fn part_two(input: String) -> usize {
     const TOTAL_SIZE:usize = 70000000;
     const UPDATE_SIZE:usize = 30000000;
+
     let fs = FileSystem { root: Directory { name: "/".to_string(), files: Vec::new(), directories: Vec::new() }};
     let filled_system = process_commands(parse_commands(input), fs);
 
@@ -59,50 +60,8 @@ fn process_commands(commands:Vec<Commands>, mut fs:FileSystem) -> FileSystem {
         }
     });
 
-    let sum: usize = fs.root.get_child_directories_at_or_below_size(100000).into_iter().map(|dir| dir.get_directory_size()).sum();
-
     return fs;
 }
-
-// fn run_terminal(input: String, mut fs:FileSystem) -> usize { 
-//     let mut path = PathBuf::from("/");
-//     let mut terminal_commands: Vec<&str> = input.lines().into_iter().collect();
-
-//     while terminal_commands.len() > 0 {
-//         let command = terminal_commands[0];
-//         if command.starts_with("$") {
-//             let split : Vec<&str>  = command.split(" ").collect();
-//             if split.get(1).unwrap().to_string() == "cd".to_string() {
-//                 if split.get(2).unwrap().to_string() == ".." {
-//                     path.pop();
-//                 }
-//                 else {
-//                     path.push(split.get(2).unwrap().to_string());
-//                 }
-//             }
-//             else {
-//                 while terminal_commands.len() > 1 && !terminal_commands.get(1).unwrap().starts_with("$") {
-//                     let list_line: Vec<&str> = terminal_commands.get(1).unwrap().split_whitespace().collect();
-//                     let slicer = list_line.as_slice();
-//                     if slicer[0] == "dir" {
-//                         fs.add_directory_to_directory_at_path(path.as_path(), slicer[1].to_string());
-//                     }
-//                     else {
-//                         fs.add_file_to_directory_at_path(path.as_path(), File { size: slicer[0].parse::<usize>().unwrap(), name: slicer[1].to_string() });
-//                     }
-//                     terminal_commands.remove(1);
-//                 }
-//             }
-//         }
-
-//         terminal_commands.remove(0);
-//     }
-
-//     let sum: usize = fs.root.get_child_directories_at_or_below_size(100000).into_iter().map(|dir| dir.get_directory_size()).sum();
-
-//     return sum;
-    
-// }
 
 enum Commands {
     ChangeDirectory(String),
@@ -271,19 +230,6 @@ mod tests {
         let dir = file_system.get_directory_at_path(Path::new("/abc/8789"));
         assert_eq!(dir.name, "8789");
     }
-
-    // #[test]
-    // fn files_can_be_added_to_directories_found_by_path() {
-    //     let mut file_system = FileSystem { root: Directory { files: Vec::new(), directories: Vec::new(), name: "/".to_string() } };
-
-    //     file_system.root.add_child_directory(Directory { files: Vec::new(), directories: vec![Directory { files: Vec::new(), directories: Vec::new(), name: "8789".to_string() }], name: "abc".to_string()} );
-    //     file_system.root.add_child_directory(Directory { files: Vec::new(), directories: Vec::new(), name: "xkc".to_string()} );
-
-    //     let dir = file_system.get_directory_at_path_mut(Path::new("/abc/8789"));
-
-    //     dir.add_child_file(File { name: "christmas_spirit.exe".to_string(),size: 2909});
-    //     assert_eq!(dir.name, "8789");
-    // }
 
     #[test]
     fn file_system_can_add_file_to_directory() {
