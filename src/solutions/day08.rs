@@ -123,11 +123,15 @@ impl Grid {
     }
 
     fn check_if_tree_is_visible(&self, position: Point) -> bool {
-        let west_visibile = self.check_if_tree_is_visible_in_direction(position, WEST);
-        let east_visible = self.check_if_tree_is_visible_in_direction(position, EAST);
-        let south_visible = self.check_if_tree_is_visible_in_direction(position, SOUTH);
-        let north_visible = self.check_if_tree_is_visible_in_direction(position, NORTH);
-        return west_visibile || east_visible || south_visible || north_visible;
+
+        let directions = [NORTH, SOUTH, EAST, WEST];
+
+        return directions
+            .map(|dir| self.check_if_tree_is_visible_in_direction(position, dir))
+            .into_iter()
+            .reduce(|accum, value| {
+                return accum || value;
+            }).unwrap();
     }
 
     pub fn get_visible_trees(&self) -> Vec<&Tree> {
