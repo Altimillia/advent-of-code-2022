@@ -80,8 +80,6 @@ impl AssignmentPair {
 
 #[cfg(test)]
 mod tests {
-    use crate::solutions::day04::Elf;
-
     use super::AssignmentPair;
 
     #[test]

@@ -65,6 +65,7 @@ struct Storage {
     crate_stacks: Vec<CrateStack>
 }
 
+#[allow(dead_code)]
 impl Storage {
 
     pub fn new(item_string: String) -> Self {
@@ -148,7 +149,7 @@ impl CrateStack {
     
     fn pop_crates(&mut self, amount: i32) -> Vec<char> {
         let mut popped_crates: Vec<char> = Vec::new();
-        for x in 0..amount {
+        for _x in 0..amount {
             popped_crates.push(self.crates.pop().unwrap());
         }
 
@@ -171,6 +172,7 @@ impl CrateStack {
     }
 }
 
+#[cfg(test)]
 mod tests {
 
     use crate::solutions::day05::CrateStack;

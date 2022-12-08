@@ -75,6 +75,7 @@ struct FileSystem {
     root: Directory
 }
 
+#[allow(dead_code)]
 impl FileSystem {
 
     pub fn add_directory_to_directory_at_path(&mut self, directory_path: &Path, name: String) { 
@@ -138,6 +139,7 @@ struct Directory {
     name: String
 }
 
+#[allow(dead_code)]
 impl Directory {
     pub fn get_directory_size(&self) -> usize {
         let files_size = self.files.iter().map(|x| x.size).sum::<usize>();
@@ -171,11 +173,6 @@ impl Directory {
 
     pub fn get_child_directory_mut(&mut self, name: String) -> &mut Directory { 
         return self.directories.iter_mut().find(|p| p.name == name).unwrap();
-    }
-
-    pub fn get_child_directory(&mut self, name: String) -> &Directory { 
-        return self.directories.first().unwrap();
-
     }
 }
 
