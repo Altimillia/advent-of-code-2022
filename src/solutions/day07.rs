@@ -184,6 +184,7 @@ struct File {
     name: String
 }
 
+#[cfg(test)]
 mod tests {
     use std::path::Path;
 
