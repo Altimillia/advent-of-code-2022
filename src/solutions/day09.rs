@@ -113,10 +113,6 @@ impl Rope {
     }
 }
 
-
-// Move the rope, and each time create a new record of the updated positions
-// Map out the positions at the end
-
 struct MovementRecord {
     tail_position: Point
 }
