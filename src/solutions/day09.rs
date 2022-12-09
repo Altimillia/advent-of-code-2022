@@ -39,10 +39,32 @@ fn get_unique_positions_of_rope(instructions: Vec<Instruction>, number_of_knots:
             return rope.run_instruction(instruction);
         }).flatten().collect();
 
+    print_out_area(movement_records.to_vec());
+
     let unique_positions = movement_records.iter().map(|rec| rec.tail_position).collect::<HashSet<Point>>();
 
 
     return unique_positions.len();
+}
+
+fn print_out_area(movement_records:Vec<MovementRecord>) { 
+    let min = movement_records.iter().map(|f| f.knots.to_vec()).flatten().min().unwrap();
+    let max = movement_records.iter().map(|f| f.knots.to_vec()).flatten().max().unwrap();
+
+    let tail_points:Vec<Point> = movement_records.iter().map(|p| p.tail_position).collect();
+
+    for x in min.x..max.x {
+        let mut row:String = "".to_string();
+        for y in min.y..max.y {
+            if tail_points.contains(&Point::new(x, y)) {
+                row = row.to_owned() + "#";
+            }
+            else {
+                row = row.to_owned() + ".";
+            }
+        }
+        println!("{}", row);
+    }
 }
 
 
@@ -78,7 +100,7 @@ impl Rope {
     fn new(number_of_knots: i32) -> Self {
         let mut knots:Vec<Point> = Vec::new();
         
-        for x in 0..number_of_knots {
+        for _x in 0..number_of_knots {
             knots.push(Point::new(0,0));
         }
 
@@ -93,12 +115,12 @@ impl Rope {
             self.knots[0] = self.knots[0] + instruction.direction;
             let mut rope_index = 1;
 
-            while(rope_index < self.knots.len()){
+            while rope_index < self.knots.len() {
                 self.update_tail(rope_index,self.knots[rope_index - 1]);
                 rope_index = rope_index + 1;
             }
             
-            movement_records.push(MovementRecord { tail_position: *self.knots.last().unwrap() });
+            movement_records.push(MovementRecord { knots: self.knots.to_vec(), tail_position: *self.knots.last().unwrap() });
         }
         return movement_records;
     }
@@ -113,7 +135,9 @@ impl Rope {
     }
 }
 
+#[derive(Clone)]
 struct MovementRecord {
+    knots: Vec<Point>,
     tail_position: Point
 }
 

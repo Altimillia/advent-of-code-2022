@@ -2,7 +2,7 @@ use std::{ops::{Add, Sub, Mul}, fmt};
 
 use num::clamp;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub struct Point {
     pub x: i32,
     pub y: i32

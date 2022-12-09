@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::fmt;
-use std::ops::{Add, Sub};
 use crate::domain::point::Point;
 
 const NORTH: Point = Point { x: 0, y: 1};
