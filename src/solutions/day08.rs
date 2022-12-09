@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt;
 use std::ops::{Add, Sub};
+use crate::domain::point::Point;
 
 const NORTH: Point = Point { x: 0, y: 1};
 const SOUTH: Point = Point { x: 0, y: -1};
@@ -22,33 +23,6 @@ pub fn part_two(input: String) -> i32 {
 
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
-struct Point {
-    x: i32,
-    y: i32
-}
-
-impl Add for Point {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self {
-        Self {x: self.x + other.x, y: self.y + other.y}
-    }
-}
-
-impl Sub for Point {
-    type Output = Self;
-
-    fn sub(self, other: Self) -> Self {
-        Self {x: self.x - other.x, y: self.y - other.y}
-    }
-}
-
-impl fmt::Display for Point {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "x: {}, y: {}", self.x, self.y)
-    }
-}
 
 struct Tree {
     height: i32
