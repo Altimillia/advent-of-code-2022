@@ -39,8 +39,6 @@ fn get_unique_positions_of_rope(instructions: Vec<Instruction>, number_of_knots:
             return rope.run_instruction(instruction);
         }).flatten().collect();
 
-    print_out_area(movement_records.to_vec());
-
     let unique_positions = movement_records.iter().map(|rec| rec.tail_position).collect::<HashSet<Point>>();
 
 
