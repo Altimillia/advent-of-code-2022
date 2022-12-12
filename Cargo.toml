@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 hex = "0.4.3"
 num = "0.4"
+nom = "7"
+meval = "0.2"
+num-bigint = "0.4.3"
