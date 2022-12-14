@@ -2,6 +2,11 @@ use std::{ops::{Add, Sub, Mul}, fmt};
 
 use num::clamp;
 
+pub const NORTH: Point = Point { x: 0, y: 1};
+pub const SOUTH: Point = Point { x: 0, y: -1};
+pub const EAST:Point = Point { x: 1, y: 0 };
+pub const WEST:Point = Point { x: -1, y: 0 };
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub struct Point {
     pub x: i32,

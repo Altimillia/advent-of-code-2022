@@ -1,7 +1,8 @@
+use std::env;
 use std::{fs, fmt::Display};
 use std::path::Path;
 use std::time::Instant;
-use crate::solutions::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11};
+use crate::solutions::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12};
 
 pub mod domain;
 pub mod solutions;
@@ -44,6 +45,9 @@ macro_rules! ship_it_extreme {
 
 
 fn main() {
+
+    let args: Vec<String> = env::args().collect();
+    println!("{}", args.len());
     ship_it!(day01::part_one(), "day1a");
     ship_it!(day01::part_two(), "day1b");
 
@@ -56,7 +60,8 @@ fn main() {
     ship_it_extreme!(day08, load_file("day8_input.txt"), "Day 8");
     ship_it_extreme!(day09, load_file("day9_input.txt"), "Day 9");
     ship_it_extreme!(day10, load_file("day10_input.txt"), "Day 10");
-    ship_it_extreme!(day11, load_file("day11_input.txt"), "Day 11");
+    // ship_it_extreme!(day11, load_file("day11_input.txt"), "Day 11");
+    ship_it_extreme!(day12, load_file("day12_input.txt"), "Day 12");
 }
 
 fn load_file(path: &str) -> String {
