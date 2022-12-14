@@ -27,7 +27,6 @@ fn path_find(start_point: Point, end_point: Point, grid: &mut Grid) -> i32 {
 
     let start = grid.get_node(start_point);
     frontier.push(start.position, 0);
-    let mut looper = 0;
 
     while frontier.len() > 0 { 
 
@@ -37,7 +36,6 @@ fn path_find(start_point: Point, end_point: Point, grid: &mut Grid) -> i32 {
         let current_copy;
         {
             let current = &mut grid.get_node(current_pos);
-            current.close();
             current_copy = current.clone();
         }
 
@@ -93,8 +91,6 @@ fn path_find(start_point: Point, end_point: Point, grid: &mut Grid) -> i32 {
         current_goal = grid.get_node(current_goal.prev.unwrap());
         counter = counter + 1;
     }
-
-    //println!("{}", counter);
     return counter;
 }
 
@@ -158,19 +154,6 @@ impl Grid {
     }
 
 
-    fn print_map(&self) {
-        for y in 0..self.size.y {
-            println!("");
-            for x in 0..self.size.x {
-                print!(" {:02} ", self.get_node(Point::new(x,y)).height);
-                //print!(" {}-{} ", x,y);
-            }
-        }
-    }
-
-    fn set_node_cost(&mut self, cost: i32, pos: Point) {
-        self.height_map.get_mut(&pos).unwrap().cost = cost;
-    }
     fn get_neighbors(&self, pos: Point) -> Vec<Point> {
         let directions = [NORTH, EAST, WEST, SOUTH];
         let mut neighbor_points:Vec<Point> = Vec::new();
@@ -182,6 +165,7 @@ impl Grid {
 
         return neighbor_points;
     }
+
     fn get_node_mut(&mut self, pos: Point) -> &GridNode {
         return self.height_map.get(&pos).unwrap();
     }
@@ -202,15 +186,6 @@ struct GridNode {
     cost: i32,
     prev: Option<Point>,
     closed: Cell<bool>
-}
-
-impl GridNode {
-    fn close(&self) {
-        self.closed.borrow().set(true);
-    }
-    fn open(&self) {
-        self.closed.borrow().set(false);
-    }
 }
 
 
