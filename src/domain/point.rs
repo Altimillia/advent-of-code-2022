@@ -25,6 +25,11 @@ impl Point {
     pub fn normalize(self) -> Self {
         Self { x: clamp(self.x, -1, 1), y: clamp(self.y, -1, 1)}
     }
+
+    pub fn parse(input: String) -> Self {
+        let split:Vec<&str> = input.trim().split(",").into_iter().collect();
+        Self { x: split[0].parse::<i32>().unwrap(), y: split[1].parse::<i32>().unwrap() }
+    }
 }
 
 impl Add for Point {

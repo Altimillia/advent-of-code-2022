@@ -2,7 +2,7 @@ use std::env;
 use std::{fs, fmt::Display};
 use std::path::Path;
 use std::time::Instant;
-use crate::solutions::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13};
+use crate::solutions::*;
 use clap::Parser;
 
 pub mod domain;
@@ -57,6 +57,7 @@ fn main() {
         11 => ship_it_extreme!(day11, load_file("day11_input.txt"), "Day 11"),
         12 => ship_it_extreme!(day12, load_file("day12_input.txt"), "Day 12"),
         13 => ship_it_extreme!(day13, load_file("day13_input.txt"), "Day 13"),
+        14 => ship_it_extreme!(day14, load_file("day14_input.txt"), "Day 14"),
         _ => panic!("Day hasnt happened yet")
     }
     // ship_it_extreme!(day02, load_file("day2_input.txt"), "Day 2");
