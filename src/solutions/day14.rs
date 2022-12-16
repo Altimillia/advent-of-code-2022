@@ -1,17 +1,10 @@
-use core::time;
-use std::{
-    borrow::BorrowMut,
-    cell::{Cell, RefCell},
-    collections::{HashMap, HashSet},
-    fmt::Display,
-    io::{self, stdin, stdout, Write},
-    rc::Rc,
-    thread::{self, Builder},
-};
+use std::{fmt::Display, collections::{HashSet, HashMap}};
 
 use itertools::Itertools;
 
-use crate::domain::point::{Point, SOUTH};
+use crate::domain::point::Point;
+
+
 
 pub fn part_one(input: String) -> impl Display {
 
@@ -31,7 +24,7 @@ pub fn part_two(input: String) -> impl Display {
 
     let mut grid = Grid::new(grid_objects, Point { x: 500, y: 0 }, true);
 
-    let map = grid.print_grid(PrintOptions::Objects);
+    let map = grid.print_grid();
     print!("{}", map);
 
     let mut count = 0;
@@ -43,7 +36,7 @@ pub fn part_two(input: String) -> impl Display {
     }
 
     println!("");
-    println!("{}", grid.print_grid(PrintOptions::Objects));
+    println!("{}", grid.print_grid());
     println!("");
 
     let sand_count = grid
@@ -292,7 +285,7 @@ impl Grid {
         return path;
     }
 
-    fn print_grid(&self, print_options: PrintOptions) -> String {
+    fn print_grid(&self) -> String {
         let mut map = String::new();
         for y in self.min.y..=self.max.y {
             map.push_str("\n");
