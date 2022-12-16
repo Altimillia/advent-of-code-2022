@@ -43,7 +43,7 @@ macro_rules! ship_it_extreme {
 
 fn main() {
     let run_arguement = RunArgument::parse();
-
+    env::set_var("RUST_BACKTRACE", "1");
     match run_arguement.day {
         2 => ship_it_extreme!(day02, load_file("day2_input.txt"), "Day 2"),
         3 => ship_it_extreme!(day03, load_file("day3_input.txt"), "Day 3"),
@@ -58,6 +58,7 @@ fn main() {
         12 => ship_it_extreme!(day12, load_file("day12_input.txt"), "Day 12"),
         13 => ship_it_extreme!(day13, load_file("day13_input.txt"), "Day 13"),
         14 => ship_it_extreme!(day14, load_file("day14_input.txt"), "Day 14"),
+        15 => ship_it_extreme!(day15, load_file("day15_input.txt"), "Day 15"),
         _ => panic!("Day hasnt happened yet")
     }
     // ship_it_extreme!(day02, load_file("day2_input.txt"), "Day 2");

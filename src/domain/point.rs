@@ -45,6 +45,11 @@ impl Point {
 
         return points;
     }
+
+    pub fn get_neighbors(&self) -> Vec<Point> {
+        let directions = [NORTH, EAST, WEST, SOUTH];
+        return directions.iter().map(|dir| *dir + *self).collect();
+    }
 }
 
 impl Add for Point {
