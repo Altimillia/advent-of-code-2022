@@ -60,27 +60,3 @@ fn read_input(input: &str) -> Vec<Value> {
         .map(|line| serde_json::from_str(line).unwrap())
         .collect()
 }
-
-// enum Term {
-//     Int(usize),
-//     List(Vec<Term>)
-// }
-
-// impl Term {
-//     fn parse(line: &str) -> Option<Term> {
-//         Self::parse_recursive(&mut line.chars().peekable())
-//     }
-
-//     fn parse_recursive(chars: &mut Peekable<impl Iterator<Item = char>>) -> Option<Term> {
-//         match chars.next() {
-//             Some(c) => {
-
-//             },
-//             Some('[') => {
-
-//             },
-//             _ => None
-//         }
-//         return None;
-//     }
-// }

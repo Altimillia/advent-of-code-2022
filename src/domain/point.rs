@@ -1,4 +1,4 @@
-use std::{ops::{Add, Sub, Mul}, fmt};
+use std::{ops::{Add, Sub, Mul}, fmt, cmp};
 
 use num::clamp;
 
@@ -29,6 +29,21 @@ impl Point {
     pub fn parse(input: String) -> Self {
         let split:Vec<&str> = input.trim().split(",").into_iter().collect();
         Self { x: split[0].parse::<i32>().unwrap(), y: split[1].parse::<i32>().unwrap() }
+    }
+    pub fn all_points_between(&self, rhs: Point) -> Vec<Point> {
+        let x_min = cmp::min(self.x, rhs.x);
+        let y_min = cmp::min(self.y, rhs.y);
+        let x_max = cmp::max(self.x, rhs.x);
+        let y_max = cmp::max(self.y, rhs.y);
+        let mut points:Vec<Point> = Vec::new();
+
+        for x in x_min..=x_max {
+            for y in y_min..=y_max {
+                points.push(Point::new(x, y));
+            }
+        }
+
+        return points;
     }
 }
 
