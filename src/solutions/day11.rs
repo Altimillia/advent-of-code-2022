@@ -30,7 +30,7 @@ pub fn part_two(input: String) -> u64 {
     let mut keep_away = KeepAway { monkeys: monkeys };
     let divisor_product = keep_away.monkeys.iter().map(|m| m.evaluate_number).product::<u64>();
 
-    for i in 0..10000 {
+    for _ in 0..10000 {
         keep_away.run_round(divisor_product);
     }
 
@@ -60,9 +60,7 @@ impl KeepAway {
             for mut item in monkey_copy.items.iter().copied() {
                 item = Item { worry_level: item.worry_level % divisor_product };
                 item = monkey_copy.inspect(item);
-                // if is_bored {
-                //     item = monkey_copy.bored(item); 
-                // }
+
                 let toss_to = monkey_copy.decide(item);
 
                 self.monkeys.get_mut(toss_to as usize).unwrap().catch_mut(item);
@@ -73,6 +71,8 @@ impl KeepAway {
 
 
 }
+
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct Monkey {
     items: Vec<Item>,
@@ -103,10 +103,6 @@ impl Monkey {
             return Ok(line.split("=").nth(1).unwrap().to_string().parse().unwrap());
         }
 
-        fn test_parser(line: &str) -> Result<Box<dyn Test>> {
-            return Ok(Box::new(DivisibleTest { division_number: i32::from_str_radix(line.split_whitespace().last().unwrap(), 10).unwrap()}));
-        }
-
         fn get_last_number_in_line(line: &str) -> Result<i32> {
             return Ok(i32::from_str_radix(line.split_whitespace().last().unwrap(), 10).unwrap());
         }
@@ -130,10 +126,6 @@ impl Monkey {
         let op = self.operation.to_owned();
         let func = op.bind("old").unwrap();
         return Item { worry_level: func(item.worry_level as f64).round() as u64 };
-    }
-
-    fn bored(&self, item: Item) -> Item {
-        return Item { worry_level: item.worry_level / 3 };
     }
 
     fn decide(&self, item: Item) -> i32 {

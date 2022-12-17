@@ -59,19 +59,9 @@ fn main() {
         13 => ship_it_extreme!(day13, load_file("day13_input.txt"), "Day 13"),
         14 => ship_it_extreme!(day14, load_file("day14_input.txt"), "Day 14"),
         15 => ship_it_extreme!(day15, load_file("day15_input.txt"), "Day 15"),
+        16 => ship_it_extreme!(day16, load_file("day16_input.txt"), "Day 16"),
         _ => panic!("Day hasnt happened yet")
     }
-    // ship_it_extreme!(day02, load_file("day2_input.txt"), "Day 2");
-    // ship_it_extreme!(day03, load_file("day3_input.txt"), "Day 3");
-    // ship_it_extreme!(day04, load_file("day4_input.txt"), "Day 4");
-    // ship_it_extreme!(day05, load_file("day5_input.txt"), "Day 5");
-    // ship_it_extreme!(day06, load_file("day6_input.txt"), "Day 6");
-    // ship_it_extreme!(day07, load_file("day7_input.txt"), "Day 7");
-    // ship_it_extreme!(day08, load_file("day8_input.txt"), "Day 8");
-    // ship_it_extreme!(day09, load_file("day9_input.txt"), "Day 9");
-    // ship_it_extreme!(day10, load_file("day10_input.txt"), "Day 10");
-    // // ship_it_extreme!(day11, load_file("day11_input.txt"), "Day 11");
-    // ship_it_extreme!(day12, load_file("day12_input.txt"), "Day 12");
 }
 
 fn load_file(path: &str) -> String {

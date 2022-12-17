@@ -44,7 +44,7 @@ fn get_unique_positions_of_rope(instructions: Vec<Instruction>, number_of_knots:
 
     return unique_positions.len();
 }
-
+#[allow(dead_code)]
 fn print_out_area(movement_records:Vec<MovementRecord>) { 
     let min = movement_records.iter().map(|f| f.knots.to_vec()).flatten().min().unwrap();
     let max = movement_records.iter().map(|f| f.knots.to_vec()).flatten().max().unwrap();
@@ -133,6 +133,7 @@ impl Rope {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 struct MovementRecord {
     knots: Vec<Point>,

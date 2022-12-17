@@ -6,7 +6,7 @@ use crate::domain::point::Point;
 
 
 
-pub fn part_one(input: String) -> impl Display {
+pub fn part_one(_: String) -> impl Display {
 
     0
 }
@@ -162,6 +162,7 @@ impl Grid {
         }
     }
 
+    #[allow(unused_assignments)]
     fn tick(&mut self, sand: Option<Point>) -> Option<Point> {
         let mut sand_moved = false;
         let mut sand_point: Option<Point> = Option::None;
@@ -169,7 +170,7 @@ impl Grid {
             let point = &mut self
                 .grid_points
                 .iter()
-                .find(|(p, gp)| {
+                .find(|(_, gp)| {
                     matches!(gp.occupied, GridObject::Sand) && gp.at_rest == false
                 })
                 .map(|p| p.0.clone());
@@ -303,9 +304,6 @@ impl Grid {
     }
 }
 
-enum PrintOptions {
-    Objects,
-}
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 enum GridObject {
     Sand,

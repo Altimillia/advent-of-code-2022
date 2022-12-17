@@ -140,6 +140,7 @@ fn manhattan_distance(p1:Point, p2:Point) -> i32 {
 }
 
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 struct Sensor {
     closest_beacon: Point,
     position: Point,
@@ -186,8 +187,6 @@ impl Sensor {
 mod tests {
     use crate::solutions::day15::{get_sensors, get_occupied_spaces_in_row};
 
-    use super::part_one;
-
     #[test]
     fn part_one_gets_value() {
         let input = "Sensor at x=2, y=18: closest beacon is at x=-2, y=15
@@ -205,7 +204,6 @@ mod tests {
         Sensor at x=14, y=3: closest beacon is at x=15, y=3
         Sensor at x=20, y=1: closest beacon is at x=15, y=3";
 
-        
         let sensors = get_sensors(input.to_string());
         let result = get_occupied_spaces_in_row(sensors, 10);
 

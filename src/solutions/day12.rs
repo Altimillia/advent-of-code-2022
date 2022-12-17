@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, VecDeque}, ops::Index, cell::Cell, borrow::Borrow};
+use std::{collections::{HashMap}, cell::Cell};
 
 use priority_queue::PriorityQueue;
 
@@ -99,12 +99,12 @@ fn heuristic(a:Point, b:Point) -> i32 {
 }
 
 fn height_to_int(height_char: char) -> i32 {
-    if(height_char == 'S')
+    if height_char == 'S'
     {
         return 1;
     }
 
-    if(height_char == 'E') {
+    if height_char == 'E' {
         return 26;
     }
     let num:u32 = height_char as u32;
@@ -115,6 +115,7 @@ fn height_to_int(height_char: char) -> i32 {
 }
 
 
+#[allow(dead_code)]
 struct Grid {
     height_map: HashMap<Point, GridNode>,
     size: Point,
@@ -166,9 +167,6 @@ impl Grid {
         return neighbor_points;
     }
 
-    fn get_node_mut(&mut self, pos: Point) -> &GridNode {
-        return self.height_map.get(&pos).unwrap();
-    }
     fn get_node(&self, pos: Point) -> &GridNode {
         return self.height_map.get(&pos).unwrap();
     }

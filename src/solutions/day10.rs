@@ -1,4 +1,4 @@
-use std::{ops::Add, collections::HashMap};
+use std::collections::HashMap;
 
 pub fn part_one(input: String) -> i32 { 
     let mut cpu = Cpu { current_instruction: Box::new(Noop { cycles: 0}), register: 1};
