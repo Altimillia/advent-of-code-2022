@@ -60,8 +60,8 @@ fn main() {
         14 => ship_it_extreme!(day14, load_file("day14_input.txt"), "Day 14"),
         15 => ship_it_extreme!(day15, load_file("day15_input.txt"), "Day 15"),
         16 => ship_it_extreme!(day16, load_file("day16_input.txt"), "Day 16"),
-        17 => println!("{}", day17_two::part_two(load_file("day17_input.txt").as_str()).unwrap()),
-        18 => ship_it_extreme!(day17, load_file("day17_input.txt"), "Day 17"),
+        17 => ship_it_extreme!(day17, load_file("day17_input.txt"), "Day 17"),
+        18 => ship_it_extreme!(day18, load_file("day18_input.txt"), "Day 18"),
         _ => panic!("Day hasnt happened yet")
     }
 
