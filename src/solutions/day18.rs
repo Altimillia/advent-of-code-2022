@@ -11,6 +11,7 @@ pub const EAST:Vertex = Vertex { x: 1, y: 0, z: 0 };
 pub const WEST:Vertex = Vertex { x: -1, y: 0, z: 0 };
 pub const DOWN:Vertex = Vertex { x: 0, y: 0, z: -1};
 pub const UP: Vertex = Vertex { x: 0, y: 0, z: 1 };
+
 pub fn part_one(input: String) -> impl Display {
     let mut count = 0;
     let mut shapes = input.lines().map(|line| {

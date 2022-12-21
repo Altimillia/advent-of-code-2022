@@ -7,23 +7,28 @@ pub fn part_one(input: String) -> impl Display {
 
     let blueprints = parse_blueprints(input);
 
+    let mut quality_sum = 0;
     blueprints.iter().for_each(|bp| {
         println!("ID: {}", bp.id);
-        const minutes_total:i32 = 8;
-        let strat = optimize(&bp, Supplies::new(0,0,0,0), &vec![Robot::new(RobotModel::Ore)], minutes_total, &Vec::new());
+        const minutes_total:i32 = 24;
+        let operation = Operation { clay_robots: 0, geode_robots: 0, obsidian_robots: 0, ore_robots: 1};
+        let strat = optimize(&bp, Supplies::new(0,0,0,0), minutes_total, operation);
 
+        println!("{}", bp.max_ore_cost_per_turn);
         println!("Strategy for Id {}", bp.id);
         println!("  {}", strat.supplies);
+        quality_sum = quality_sum + (strat.supplies.geodes * bp.id);
 
-        strat.records.iter().for_each(|r| {
+        // strat.records.iter().for_each(|r| {
 
-            match r {
-                Record::Nothing(minutes, supplies) => println!("      Minute: {} Did nothing. Have {}", minutes_total - minutes, supplies),
-                Record::BuiltRobot(minutes, supplies, model, _) => println!("      Minute: {} Built {:?}. Have {}",minutes_total - minutes, model, supplies),
-            }
-        });
+        //     match r {
+        //         Record::Nothing(minutes, supplies) => println!("      Minute: {} Did nothing. Have {}", minutes_total - minutes, supplies),
+        //         Record::BuiltRobot(minutes, supplies, model, _) => println!("      Minute: {} Built {:?}. Have {}",minutes_total - minutes, model, supplies),
+        //     }
+        // });
     });
-    0
+
+    quality_sum
 }
 
 pub fn part_two(input: String) -> impl Display {
@@ -34,15 +39,17 @@ fn parse_blueprints(input: String) -> Vec<Blueprint> {
     input.lines().map(|line| Blueprint::parse(line).unwrap().1).collect_vec()
 }
 
-fn optimize(blueprint: &Blueprint, supplies: Supplies, robots: &Vec<Robot>, minutes_left: i32, records: &Vec<Record>) -> Strategy {
+fn optimize(blueprint: &Blueprint, supplies: Supplies, minutes_left: i32, operation: Operation) -> Strategy {
 
     let mut strategies:Vec<Strategy> = Vec::new();
     let total_supplies = supplies.clone();
-    let actions = vec![Action::Nothing,
-        //  Action::BuildRobot(RobotModel::Geode),
-        //  Action::BuildRobot(RobotModel::Obsidian),
-         Action::BuildRobot(RobotModel::Clay),
-         Action::BuildRobot(RobotModel::Ore)
+    let actions = vec![Action::Nothing, Action::Build];
+
+    let models = vec![
+        RobotModel::Ore,
+        RobotModel::Clay,
+        RobotModel::Obsidian,
+        RobotModel::Geode 
         ];
 
     if minutes_left > 0
@@ -51,51 +58,78 @@ fn optimize(blueprint: &Blueprint, supplies: Supplies, robots: &Vec<Robot>, minu
         let remaining_minutes = minutes_left - 1;
 
 
+        let gathered = Supplies::new(operation.ore_robots, operation.clay_robots, operation.obsidian_robots, operation.geode_robots);
+
+
         for action in actions {
             match action {
                 Action::Nothing => {
-                    let total_supplies = robots.iter().fold(total_supplies, |mut accum, robot| {
-                        accum = accum + robot.gather();
-                        return accum;
-                    });
+                    let total_supplies = total_supplies + gathered;
 
-                    let mut branch = records.clone();
-                    branch.push(Record::Nothing(remaining_minutes, total_supplies));
-                    // Save!
-                    let strat = optimize(blueprint, total_supplies, &robots, remaining_minutes, &branch);
-                    strategies.push(Strategy { supplies: strat.supplies, records: strat.records })
+                    //let mut branch = records.clone();
+                    //branch.push(Record::Nothing(remaining_minutes, total_supplies));
+
+                    let strat = optimize(blueprint, total_supplies, remaining_minutes, operation);
+                    strategies.push(Strategy { 
+                        supplies: strat.supplies
+                        //, records: strat.records 
+                    })
                 },
-                Action::BuildRobot(model) => {
-                    if !blueprint.can_afford(model, total_supplies) {
-                        continue;
+                Action::Build => {
+                    for model in models.iter() {
+                        if !blueprint.can_afford(*model, total_supplies) 
+                            || remaining_minutes < 1
+                            || (remaining_minutes < 2 && !matches!(model, RobotModel::Geode)) {
+                            continue;
+                        }
+
+                        if matches!(model, RobotModel::Ore) && blueprint.max_ore_cost_per_turn <= operation.ore_robots ||
+                            matches!(model, RobotModel::Clay) && blueprint.obsidian_robot_cost.clay <= operation.clay_robots ||
+                            matches!(model, RobotModel::Obsidian) && blueprint.geode_robot_cost.obsidian <= operation.obsidian_robots {
+                            continue;
+                        }
+
+                        if remaining_minutes < 13 && matches!(model, RobotModel::Ore) {
+                            continue;
+                        }
+                        if remaining_minutes < 9 && matches!(model, RobotModel::Clay) {
+                            continue;
+                        }
+
+                        let mut branch = operation.clone();
+                        let branched_supplies = total_supplies - blueprint.get_cost_for_model(*model) + gathered;
+
+                        match model {
+                            RobotModel::Ore => branch.ore_robots = branch.ore_robots + 1,
+                            RobotModel::Clay => branch.clay_robots = branch.clay_robots + 1,
+                            RobotModel::Obsidian => branch.obsidian_robots = branch.obsidian_robots + 1,
+                            RobotModel::Geode => branch.geode_robots = branch.geode_robots + 1,
+                        }
+
+                        let strat = optimize(blueprint, branched_supplies, remaining_minutes, branch);
+
+                        strategies.push(Strategy { 
+                            supplies: strat.supplies, 
+                            //records: strat.records 
+                        });
+                        if matches!(model, RobotModel::Geode) {
+                            break;
+                        }
                     }
-                    let branched_supplies = total_supplies - blueprint.get_cost_for_model(model);
-
-                    let branched_supplies = robots.iter().fold(branched_supplies, |mut accum, robot| {
-                        accum = accum + robot.gather();
-                        return accum;
-                    });
-            
-                    let mut robots_clone = robots.clone();
-                    robots_clone.push(Robot::new(model));
-                    let mut branch = records.clone();
-
-                    branch.push(Record::BuiltRobot(remaining_minutes, branched_supplies, model, blueprint.get_cost_for_model(model)));
-                    let strat = optimize(blueprint, branched_supplies, &robots_clone, remaining_minutes, &branch);
-
-                    strategies.push(Strategy { supplies: strat.supplies, records: strat.records });
-                    //break;
-                },
+                }
             }
         }
     }
     else {
-        strategies.push(Strategy { supplies: total_supplies.clone(), records: records.clone() });
+        strategies.push(Strategy { supplies: total_supplies.clone()
+            //, records: records.clone() 
+        });
     }
 
-    let mut best_strategy = Strategy { records: Vec::new(), supplies: Supplies::new(-1,-1,-1,-1)};
+    let mut best_strategy = Strategy { 
+        supplies: Supplies::new(-1,-1,-1,-1)};
     for strategy in strategies {
-        if strategy.supplies.ore > best_strategy.supplies.ore {
+        if strategy.supplies.geodes > best_strategy.supplies.geodes {
             best_strategy = strategy;
         }
     }
@@ -106,18 +140,26 @@ fn optimize(blueprint: &Blueprint, supplies: Supplies, robots: &Vec<Robot>, minu
 
 struct Strategy {
     supplies: Supplies,
-    records: Vec<Record>
+    // records: Vec<Record>
 }
 #[derive(Debug, Hash, Clone, Copy)]
 enum Action {
     Nothing,
-    BuildRobot(RobotModel)
+    Build
 }
 
 #[derive(Debug, Hash, Clone, Copy)]
 enum Record {
     Nothing(i32, Supplies),
     BuiltRobot(i32, Supplies, RobotModel, Supplies)
+}
+
+#[derive(Debug, Hash, Clone, Copy)]
+struct Operation {
+    ore_robots: i32,    
+    clay_robots: i32,
+    obsidian_robots: i32,
+    geode_robots: i32,
 }
 
 #[derive(Debug, Hash, Clone, Copy)]
@@ -239,7 +281,8 @@ struct Blueprint {
     ore_robot_cost: Supplies,
     clay_robot_cost: Supplies,
     obsidian_robot_cost: Supplies,
-    geode_robot_cost: Supplies
+    geode_robot_cost: Supplies,
+    max_ore_cost_per_turn: i32
 }
 impl Blueprint {
     fn parse(input: &str) -> IResult<&str, Self> {
@@ -250,12 +293,14 @@ impl Blueprint {
         let (input, obsidian_clay_cost) = Blueprint::get_next_number(input)?;
         let (input, geode_ore_cost) = Blueprint::get_next_number(input)?;
         let (input, geode_obsidian_cost) = Blueprint::get_next_number(input)?;
+        let max_ore_use_per_turn = ore_cost.max( clay_ore_cost.max( obsidian_ore_cost.max( geode_ore_cost)));
 
         let bp = Blueprint { id, 
             ore_robot_cost: Supplies::new(ore_cost,0,0,0), 
             clay_robot_cost: Supplies::new(clay_ore_cost,0,0,0),
             obsidian_robot_cost: Supplies::new(obsidian_ore_cost, obsidian_clay_cost,0,0),
-            geode_robot_cost: Supplies::new(geode_ore_cost,0, geode_obsidian_cost,0)
+            geode_robot_cost: Supplies::new(geode_ore_cost,0, geode_obsidian_cost,0),
+            max_ore_cost_per_turn: max_ore_use_per_turn
         };
 
         return Ok((input, bp));

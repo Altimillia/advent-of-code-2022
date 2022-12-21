@@ -63,7 +63,7 @@ fn main() {
         16 => ship_it_extreme!(day16, load_file("day16_input.txt"), "Day 16"),
         17 => ship_it_extreme!(day17, load_file("day17_input.txt"), "Day 17"),
         18 => ship_it_extreme!(day18, load_file("day18_input.txt"), "Day 18"),
-        19 => ship_it_extreme!(day19, load_file("day19_input_test.txt"), "Day 19"),
+        19 => ship_it_extreme!(day19, load_file("day19_input.txt"), "Day 19"),
         _ => panic!("Day hasnt happened yet")
     }
 
