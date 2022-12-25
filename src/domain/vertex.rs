@@ -2,9 +2,9 @@ use std::{ops::{Add, Sub}, fmt, collections::HashSet };
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub struct Vertex {
-    x: i32,
-    y: i32,
-    z: i32
+    pub x: i32,
+    pub y: i32,
+    pub z: i32
 }
 
 impl Vertex {

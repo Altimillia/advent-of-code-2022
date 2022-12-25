@@ -1,7 +1,65 @@
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::{HashMap, HashSet}, fmt::Display, ops::{Add, Sub}};
 use nom::{IResult, character::{complete::{alpha1}}, multi::{many0}, branch::alt};
+use num::integer::Roots;
 
-use crate::{domain::point::{*, self}, tools::{parse_numbers}};
+use crate::{domain::{point::{*, self}, vertex::Vertex}, tools::{parse_numbers}};
+
+static DIRECTIONS: [Point; 4] = [
+    Point { x: 1, y: 0 },
+    Point { x: 0, y: 1 },
+    Point { x: -1, y: 0 },
+    Point { x: 0, y: -1 },
+];
+
+static DIRECTIONS3: [Vertex; 4] = [
+    // R, D, L, U; y is flipped
+    Vertex { x: 1, y: 0, z: 0 },
+    Vertex { x: 0, y: -1, z: 0 },
+    Vertex { x: -1, y: 0, z: 0 },
+    Vertex { x: 0, y: 1, z: 0 },
+];
+#[derive(Debug, Clone, Copy)]
+struct Vector3 {
+    x: f32,
+    y: f32,
+    z: f32
+}
+
+impl Vector3 {
+pub fn new(x: f32, y: f32, z: f32) -> Self {
+    return Vector3 { x, y, z };
+}
+    
+}
+
+impl From<Vertex> for Vector3 {
+    fn from(p: Vertex) -> Self {
+        Vector3::new(p.x as f32, p.y as f32, p.z as f32)
+    }
+}
+impl From<Vector3> for Vertex {
+    fn from(p: Vector3) -> Self {
+        Vertex::new(p.x.round() as i32, p.y.round() as i32, p.z.round() as i32)
+    }
+}
+
+impl Add for Vector3 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {x: self.x + other.x, y: self.y + other.y, z: self.z + other.z}
+    }
+}
+
+impl Sub for Vector3 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {x: self.x - other.x, y: self.y - other.y, z: self.z - other.z}
+    }
+}
+
+
 
 pub fn part_one(input: String) -> impl Display {
     let (grid, instructions) = parse_map(input);
@@ -14,10 +72,87 @@ pub fn part_one(input: String) -> impl Display {
 }
 
 pub fn part_two(input: String) -> impl Display {
-    let (grid, instructions) = parse_map(input);
-    let cube = Cube::parse(grid, 50);
-    0
+    let (mut grid, instructions) = parse_map(input);
+    let mut cube = add_cube(&mut grid);
+
+    let (position, direction) = walk_cube(&grid, &mut cube, instructions);
+
+    (position.y * 1000) + (position.x * 4) + direction.direction_score()
 }
+
+fn walk_cube(grid: &Grid, cube: &mut Cube, mut instructions: Vec<Instruction>) -> (Point, Direction) {
+    println!("{}", &grid.get_starting_position());
+    let pos3 = cube
+        .get_3d_pos(&grid.get_starting_position())
+        .ok_or("invalid 3d map").unwrap();
+
+    let mut cube_walk = cube.clone();
+    let mut visited = Vec::new();
+
+    let mut player = Player3D { position3D: pos3, facing3D: Direction::East, position2d: grid.get_starting_position()  };
+    while instructions.len() > 0 {
+        let next_ins = instructions.remove(0);
+
+        match next_ins {
+            Instruction::Move(movement) => {
+                let mut remaining = movement;
+
+                while remaining > 0 {
+                    let cube_orig = cube_walk.clone();
+                    // let (point, tile) = grid.get_next_tile_in_direction(player.position, player.facing);
+                    let mut next_pos3 = player.position3D + player.facing3D.to_vertex();
+                    match next_pos3 {
+                        p if p.x < 0 => {
+                            cube.rotate(rad(90), 0.0, 0.0);
+                            next_pos3.x = grid.side_len - 1;
+                        }
+                        p if p.x >= grid.side_len => {
+                            cube.rotate(rad(-90), 0.0, 0.0);
+                            next_pos3.x = 0;
+                        }
+                        p if p.y < 0 => {
+                            cube.rotate(0.0, rad(-90), 0.0);
+                            next_pos3.y = grid.side_len - 1;
+                        }
+                        p if p.y >= grid.side_len => {
+                            cube.rotate(0.0, rad(90), 0.0);
+                            next_pos3.y = 0;
+                        }
+                        _ => (),
+                    };
+
+                    let pos2 = cube.tiles.get(&next_pos3).unwrap();
+
+                    let tile = grid.tiles.get(pos2).unwrap();
+
+                    player.move_to_tile(next_pos3, *tile, cube);
+                    if matches!(tile, Tile::Floor) {
+                        remaining -= 1;
+                        visited.push(player.position2d);
+                    }
+                    else {
+                        remaining = 0;
+                    }
+                    cube_walk = cube_orig;
+                }
+            },
+            Instruction::Rotate(rotation) => { 
+                player.change_facing(rotation); 
+            },
+        }
+
+    }
+
+    let facing = DIRECTIONS
+        .iter()
+        .position(|&p| p == (player.position2d - visited[visited.len() - 2]))
+        .ok_or("case when turning on the last tile is not handled");
+
+    println!("{:?}", facing);
+    println!("{:?}",  player.facing3D);
+    (player.position2d, player.facing3D)
+}
+
 
 fn move_around_map(grid: Grid, mut instructions: Vec<Instruction>) -> (Point, Direction) {
     let start = grid.get_starting_position();
@@ -92,11 +227,78 @@ fn parse_rotate(input: &str) -> IResult<&str, Instruction> {
     Ok((input, ins))
 }
 
+
+fn add_cube(grid: &mut Grid) -> Cube {
+    // find position of sides within the tile map
+    let mut sides = Vec::new();
+    for y in 0..(grid.height / grid.side_len) {
+        for x in 0..(grid.width / grid.side_len) {
+            let tile_pos = Point::new((x * grid.side_len) + 1, (y * grid.side_len) + 1);
+            println!("{:?}", tile_pos);
+            if grid.tiles.contains_key(&tile_pos) {
+                println!("{:?}", Point::new(x, y));
+                sides.push(Point::new(x, y));
+            }
+        }
+    }
+
+    // map sides to cube
+    let start = sides[0].clone();
+    let sides_map: HashSet<Point> = HashSet::from_iter(sides);
+    let mut cube = Cube {
+        side_len: 50,
+        tiles: HashMap::new()
+    };
+    fill_cube(&start, &sides_map, &mut HashSet::new(), &mut cube, &grid);
+    return cube;
+}
+
+fn rad(deg: i32) -> f32 {
+    (deg as f32).to_radians()
+}
+
+fn fill_cube(
+    side: &Point,
+    sides: &HashSet<Point>,
+    visited: &mut HashSet<Point>,
+    cube: &mut Cube,
+    grid: &Grid
+) {
+    for y in side.y * cube.side_len..side.y * cube.side_len + cube.side_len {
+        for x in side.x * cube.side_len..side.x * cube.side_len + cube.side_len {
+            let from = Point::new(x + 1, y + 1);
+            let to = Vertex::new(
+                x - side.x * cube.side_len,
+                grid.side_len - 1 - (y - side.y * cube.side_len), // flip y
+                1,
+            );
+            //println!("{:?}", from);
+            cube.tiles.insert(to, from);
+        }
+    }
+
+    for (dir_idx, dir) in DIRECTIONS.iter().enumerate() {
+        let next_side = *side + *dir;
+        if visited.insert(next_side) && sides.contains(&next_side) {
+            match dir_idx {
+                0 | 2 => cube.rotate(rad((dir_idx as i32 - 1) * 90), 0.0, 0.0),
+                _ => cube.rotate(0.0, rad((dir_idx as i32 - 2) * 90), 0.0),
+            }
+            fill_cube(&next_side, sides, visited, cube, grid);
+            match dir_idx {
+                0 | 2 => cube.rotate(rad((dir_idx as i32 - 1) * -90), 0.0, 0.0),
+                _ => cube.rotate(0.0, rad((dir_idx as i32 - 2) * -90), 0.0),
+            }
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Player {
     position: Point,
     facing: Direction
 }
+
 impl Player {
     fn move_to_tile(&mut self, point: Point, tile: Tile) {
         match tile {
@@ -113,27 +315,93 @@ impl Player {
     }
 }
 
-struct Cube {
+struct Player3D {
+    position3D: Vertex,
+    facing3D: Direction,
+    position2d: Point
+}
 
-    cube_faces: HashMap<CubeFace, Vec<Point>>
+impl Player3D {
+    fn move_to_tile(&mut self, pos3d: Vertex, tile: Tile, cube: &Cube) {
+        match tile {
+            Tile::Floor => 
+            { 
+                self.position3D = pos3d;
+                self.position2d = *cube.tiles.get(&pos3d).unwrap(); 
+            },
+            Tile::Wall => (),
+        }
+    }
+
+    fn change_facing(&mut self, rotation: Rotation) { 
+        match rotation {
+            Rotation::Left => self.facing3D = self.facing3D.rotate_left(),
+            Rotation::Right => self.facing3D = self.facing3D.rotate_right(),
+        }
+    }
+}
+
+
+#[derive(Debug, Clone)]
+struct Cube {
+    side_len: i32,
+    tiles: HashMap<Vertex, Point>
 }
 
 impl Cube {
-    fn parse(grid: Grid, cube_size: i32) -> Self {
-        let start = grid.get_starting_position();
-
-        let mut cube_faces = HashMap::new();
-        //
-        cube_faces.insert(CubeFace::Top, vec![start, start + Point::new(cube_size, 0), start + Point::new(cube_size, cube_size), start + Point::new(0, cube_size)]);
-        cube_faces.insert(CubeFace::Right, vec![start + Point::new(cube_size, 0), start + Point::new(cube_size * 2, 0), start + Point::new(cube_size * 2, cube_size), start + Point::new(cube_size, cube_size)]);
-
-        Cube { cube_faces }
+    fn get_3d_pos(&self, p: &Point) -> Option<Vertex> {
+        self.tiles.iter().find(|(_, &p2)| p2 == *p).map(|x| *x.0)
     }
+
+    #[allow(non_snake_case)]
+    fn rotate(&mut self, pitch: f32, roll: f32, yaw: f32) {
+        let cosa = yaw.cos();
+        let sina = yaw.sin();
+        let cosb = pitch.cos();
+        let sinb = pitch.sin();
+        let cosc = roll.cos();
+        let sinc = roll.sin();
+        let Axx = cosa * cosb;
+        let Axy = cosa * sinb * sinc - sina * cosc;
+        let Axz = cosa * sinb * cosc + sina * sinc;
+        let Ayx = sina * cosb;
+        let Ayy = sina * sinb * sinc + cosa * cosc;
+        let Ayz = sina * sinb * cosc - cosa * sinc;
+        let Azx = -sinb;
+        let Azy = cosb * sinc;
+        let Azz = cosb * cosc;
+
+        let t = Vector3::new(
+            (self.side_len as f32 - 1.0) / -2.0,
+            (self.side_len as f32 - 1.0) / -2.0,
+            (self.side_len as f32 - 1.0) / 2.0,
+        );
+
+        // translate
+        let tiles_f = self.tiles.drain().map(|(p, c)| (Vector3::from(p) + t, c));
+
+        // rotate
+        let tiles_f = tiles_f.map(|(p, c)| {
+            let p2 = Vector3::new(
+                Axx * p.x + Axy * p.y + Axz * p.z,
+                Ayx * p.x + Ayy * p.y + Ayz * p.z,
+                Azx * p.x + Azy * p.y + Azz * p.z,
+            );
+            (p2, c)
+        });
+
+        // translate back
+        self.tiles = HashMap::from_iter(tiles_f.map(|(p, c)| (Vertex::from(p - t), c)));
+    }
+
 }
 
 #[derive(Debug)]
 struct Grid {
-    tiles: HashMap<Point, Tile>
+    tiles: HashMap<Point, Tile>,
+    side_len: i32,
+    height: i32,
+    width: i32
 }
 
 impl Grid {
@@ -155,7 +423,10 @@ impl Grid {
                 y_index += 1;
             });
 
-        Grid { tiles }
+        
+            
+        let side_len = (tiles.len() / 6).sqrt() as i32;
+        Grid { tiles, side_len, height: 200, width: 150 }
     }
 
     fn get_starting_position(&self) -> Point {
@@ -217,6 +488,15 @@ impl Direction {
         }
     }
 
+    fn to_vertex(&self) -> Vertex {
+        match self {
+            Direction::North => Vertex { x: 0, y: -1, z:0 },
+            Direction::East => Vertex { x: 1, y: 0, z: 0},
+            Direction::South => Vertex { x: 0, y: 1, z: 0},
+            Direction::West =>  Vertex { x: -1, y: 0, z: 0},
+        }
+    }
+
     fn direction_score(&self) -> i32 {
         *self as i32
     }
@@ -259,37 +539,4 @@ enum Instruction {
 enum Rotation {
     Left,
     Right
-}
-
-#[derive(PartialEq, Eq, Hash)]
-enum CubeFace {
-    Top,
-    Down,
-    Forward,
-    Back,
-    Left,
-    Right
-}
-
-impl CubeFace {
-    fn get_neighbor_face(&self, direction: Direction) -> Self {
-        match direction {
-            Direction::North => todo!(),
-            Direction::East => todo!(),
-            Direction::South => todo!(),
-            Direction::West => todo!(),
-        }
-    }
-
-    fn get_north_neighbor(&self) -> Self {
-        match &self {
-            CubeFace::Top => CubeFace::Back,
-            CubeFace::Down => CubeFace::Forward,
-            CubeFace::Forward => CubeFace::Top,
-            CubeFace::Back => CubeFace::Back,
-            CubeFace::Left => todo!(),
-            CubeFace::Right => todo!(),
-        }
-
-    }
 }
