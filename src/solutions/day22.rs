@@ -11,13 +11,6 @@ static DIRECTIONS: [Point; 4] = [
     Point { x: 0, y: -1 },
 ];
 
-static DIRECTIONS3: [Vertex; 4] = [
-    // R, D, L, U; y is flipped
-    Vertex { x: 1, y: 0, z: 0 },
-    Vertex { x: 0, y: -1, z: 0 },
-    Vertex { x: -1, y: 0, z: 0 },
-    Vertex { x: 0, y: 1, z: 0 },
-];
 #[derive(Debug, Clone, Copy)]
 struct Vector3 {
     x: f32,
@@ -99,7 +92,7 @@ fn walk_cube(grid: &Grid, cube: &mut Cube, mut instructions: Vec<Instruction>) -
 
                 while remaining > 0 {
                     let cube_orig = cube_walk.clone();
-                    // let (point, tile) = grid.get_next_tile_in_direction(player.position, player.facing);
+
                     let mut next_pos3 = player.position3D + player.facing3D.to_vertex();
                     match next_pos3 {
                         p if p.x < 0 => {
@@ -272,7 +265,6 @@ fn fill_cube(
                 grid.side_len - 1 - (y - side.y * cube.side_len), // flip y
                 1,
             );
-            //println!("{:?}", from);
             cube.tiles.insert(to, from);
         }
     }
