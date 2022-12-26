@@ -1,5 +1,5 @@
 use core::panic;
-use std::{fmt::Display, collections::HashMap, hash::Hash};
+use std::{fmt::Display, collections::HashMap};
 
 use itertools::Itertools;
 
@@ -70,7 +70,6 @@ fn tetris_time(total_rock_count: i32, jet_pattern: JetPattern) -> Vec<u64> {
 
     let mut current_rock_count:i32 = 0;
     let mut tick = 0;
-    let jet_index_length = jet_pattern.pattern.len();
     let mut height_delta: Vec<u64> = Vec::with_capacity(total_rock_count as usize);
 
     let mut prev_height = 0;
@@ -114,12 +113,14 @@ fn tetris_time(total_rock_count: i32, jet_pattern: JetPattern) -> Vec<u64> {
     
 }
 
+#[allow(unused_variables)]
 fn get_rock_start(grid: &Grid, rock: &Rock) -> Point {
     let high_point = grid.get_highest_rock_or_floor() - 1;
 
     return Point::new(2, high_point + 4);
 }
 
+#[allow(dead_code)]
 fn print_current_grid(grid: &Grid, rock: &Rock) {
     let current_max_height = grid.tiles.iter().map(|hm| hm.0.y).max().unwrap();
     //print_points(rock);
@@ -155,6 +156,7 @@ fn shift_rock(rock: Rock, direction: Point, grid: &Grid) -> (Rock, bool) {
     return (rock, false);
 }
 
+#[allow(dead_code)]
 fn print_points(rock: &Rock) {
     println!("Rock Position: ");
     rock.points.iter().for_each(|p| print!("{} ", p));
@@ -200,6 +202,7 @@ impl Grid {
         });
     }
 
+    #[allow(dead_code)]
     fn get_rock_start_position(&self) -> Point {
         let max_height = self.tiles.iter().map(|hm| hm.0.y).max().unwrap_or(0);
 
@@ -207,6 +210,7 @@ impl Grid {
     }
 }
 
+#[allow(dead_code)]
 enum Tile {
     Air,
     Rock,

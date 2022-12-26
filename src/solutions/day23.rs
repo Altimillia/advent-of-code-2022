@@ -1,5 +1,5 @@
 use core::panic;
-use std::{fmt::Display, collections::HashMap, cmp, time::Instant};
+use std::{fmt::Display, collections::HashMap};
 
 use itertools::Itertools;
 
@@ -43,19 +43,13 @@ static ALL_DIRECTIONS: [Direction; 8] = [
 
 pub fn part_one(input: String) -> impl Display {
     let mut grid = parse(input);
-    //run_simulation(grid);
-
-    let map = grid.get_print_string();
-    //println!("{}", map);
     grid.get_empty_ground_in_elf_rectangle();
-    grid = run_simulation(grid, 10);
-    // println!("{}", grid.get_print_string());
-    
+    grid = run_simulation(grid, 10);  
     grid.get_empty_ground_in_elf_rectangle()
 }
 
 pub fn part_two(input: String) -> impl Display {
-    let mut grid = parse(input);
+    let grid = parse(input);
     grid.get_empty_ground_in_elf_rectangle();
     let rounds = run_simulation_until(grid, 1000);
     
@@ -157,7 +151,7 @@ fn parse(input: String) -> Grid {
         .lines()
         .for_each(|l| {
             let mut x_index = 100;
-            l.chars().enumerate().for_each(|(n,c)| {
+            l.chars().enumerate().for_each(|(_,c)| {
                 match c {
                     '#' => { elves.push( 
                         Elf { 
@@ -201,6 +195,7 @@ impl Grid {
         return (Point::new(min_x, min_y), Point::new(max_x, max_y));
     }
 
+    #[allow(dead_code)]
     fn get_print_string(&self) -> String {
         let positions = self.elves.iter().map(|p| p.position).collect_vec();
         let min_x = positions.iter().map(|p| p.x).min().unwrap();
@@ -335,19 +330,4 @@ impl Direction {
             Direction::SouthWest => Point { x: -1, y: 1}
         }
     }
-
-
-    fn reverse(&self) -> Self {
-        match self {
-            Direction::North => Direction::South,
-            Direction::East => Direction::West,
-            Direction::South => Direction::North,
-            Direction::West => Direction::East,
-            Direction::NorthEast => Direction::SouthWest,
-            Direction::NorthWest => Direction::SouthEast,
-            Direction::SouthEast => Direction::NorthWest,
-            Direction::SouthWest => Direction::NorthEast,
-        }
-    }
-
 }

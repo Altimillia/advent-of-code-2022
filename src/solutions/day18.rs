@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::fmt::Display;
 use std::str::FromStr;
 use std::vec;
-use std::{ops::{Add, Sub, Mul}, fmt, cmp};
+use std::{ops::{Add, Sub}, fmt};
 use itertools::Itertools;
 pub const NORTH: Vertex = Vertex { x: 0, y: 1, z: 0};
 pub const SOUTH: Vertex = Vertex { x: 0, y: -1, z: 0};
@@ -38,7 +38,7 @@ pub fn part_one(input: String) -> impl Display {
 
 pub fn part_two(input: String) -> impl Display {
     let mut count = 0;
-    let mut shapes = input.lines().map(|line| {
+    let shapes = input.lines().map(|line| {
         count = count + 1;
         Shape::parse(line, count)
     }
@@ -99,6 +99,7 @@ impl fmt::Display for Vertex {
     }
 }
 #[derive(Clone)]
+#[allow(dead_code)]
 struct Shape {
     verticies: Vec<Vertex>,
     faces: Vec<Vec<Vertex>>,
@@ -241,10 +242,10 @@ mod tests {
     #[test]
     fn full_input_test() {
 
-        let mut shape_1 = Shape::parse("1,1,1", 0);
-        let mut shape_2 = Shape::parse("2,1,1", 0);
-        let mut shape_3 = Shape::parse("0,1,1", 0);
-        let mut shape_4 = Shape::parse("1,2,1", 0);
+        let shape_1 = Shape::parse("1,1,1", 0);
+        let shape_2 = Shape::parse("2,1,1", 0);
+        let shape_3 = Shape::parse("0,1,1", 0);
+        let shape_4 = Shape::parse("1,2,1", 0);
 
         let mut shapes = vec![shape_1, shape_2, shape_3, shape_4];
 

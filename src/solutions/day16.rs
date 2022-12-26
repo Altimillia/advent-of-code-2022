@@ -3,7 +3,7 @@ use std::collections::{BinaryHeap, HashSet};
 use std::{fmt::Display, collections::HashMap};
 use std::str::FromStr;
 use itertools::Itertools;
-use nom::{bytes::complete::{tag, take_while, take_while_m_n, take}, IResult, combinator::{recognize, map_res, opt, map}, sequence::{preceded, tuple}, character::complete::{char,digit1}, multi::separated_list1};
+use nom::{bytes::complete::{tag, take}, IResult, combinator::{recognize, map_res, opt}, sequence::{preceded}, character::complete::{digit1}};
 type DistanceMatrix<'a> = HashMap<String, HashMap<String, i32>>;
 
 pub fn part_one(input: String) -> impl Display {
@@ -100,7 +100,6 @@ fn get_valve_distances(valves: &Vec<Valve>) -> DistanceMatrix {
                             });
                         
                         if use_dist {
-                            let neigh = neighbour_clone.clone();
                             distances_from.insert(neighbour_clone.id.clone(), new_dist);
                             to_visit.push(Visit { id: neighbour_clone.id, distance: new_dist });
                         }

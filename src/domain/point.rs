@@ -1,4 +1,4 @@
-use std::{ops::{Add, Sub, Mul}, fmt, cmp};
+use std::{ops::{Add, Sub}, fmt, cmp};
 
 use num::clamp;
 

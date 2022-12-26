@@ -1,4 +1,4 @@
-use std::{fmt::Display, collections::{HashMap, HashSet}, clone};
+use std::{fmt::Display, collections::{HashSet}};
 
 use itertools::Itertools;
 
@@ -14,7 +14,7 @@ pub fn part_one(input: String) -> impl Display {
     0
 }
 
-pub fn part_two(input: String) -> impl Display {
+pub fn part_two(_input: String) -> impl Display {
     0
 }
 
@@ -64,11 +64,6 @@ impl GridState {
         return next_state;
     }
     fn print_grid(&self) -> String {
-        // let positions = self.elves.iter().map(|p| p.position).collect_vec();
-        // let min_x = positions.iter().map(|p| p.x).min().unwrap();
-        // let max_x = positions.iter().map(|p| p.x).max().unwrap();
-        // let min_y = positions.iter().map(|p| p.y).min().unwrap();
-        // let max_y = positions.iter().map(|p| p.y).max().unwrap();
 
         let mut map = String::new();
         map.push_str("\n");
@@ -112,7 +107,7 @@ impl GridState {
             .lines()
             .for_each(|l| {
                 let mut x_index = 0;
-                l.chars().enumerate().for_each(|(n,c)| {
+                l.chars().enumerate().for_each(|(_,c)| {
                     match c {
                         '#' => { 
                             walls.insert(Point::new(x_index, y_index));
@@ -128,8 +123,8 @@ impl GridState {
                 y_index += 1;
             });
 
-        let mut max_x = walls.iter().map(|point| point.x).max().unwrap();
-        let mut max_y = walls.iter().map(|point| point.y).max().unwrap();
+        let max_x = walls.iter().map(|point| point.x).max().unwrap();
+        let max_y = walls.iter().map(|point| point.y).max().unwrap();
     
         GridState { minutes: 0, blizzards: blizzards, walls: walls, size: Point::new(max_x,max_y) }
     }

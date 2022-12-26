@@ -2,7 +2,7 @@ use std::{collections::{HashMap, HashSet}, fmt::Display, ops::{Add, Sub}};
 use nom::{IResult, character::{complete::{alpha1}}, multi::{many0}, branch::alt};
 use num::integer::Roots;
 
-use crate::{domain::{point::{*, self}, vertex::Vertex}, tools::{parse_numbers}};
+use crate::{domain::{point::{*}, vertex::Vertex}, tools::{parse_numbers}};
 
 static DIRECTIONS: [Point; 4] = [
     Point { x: 1, y: 0 },
@@ -307,6 +307,7 @@ impl Player {
     }
 }
 
+#[allow(non_snake_case)]
 struct Player3D {
     position3D: Vertex,
     facing3D: Direction,
@@ -404,7 +405,7 @@ impl Grid {
             .lines()
             .for_each(|l| {
                 let mut x_index = 1;
-                l.chars().enumerate().for_each(|(n,c)| {
+                l.chars().enumerate().for_each(|(_,c)| {
                     match c {
                         '.' => { tiles.insert(Point::new(x_index, y_index), Tile::Floor); },
                         '#' => { tiles.insert(Point::new(x_index, y_index), Tile::Wall); },
